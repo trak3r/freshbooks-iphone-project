@@ -54,7 +54,7 @@ static FreshbooksAPI *sharedInstance = nil;
 		[apiURL release];
 	}
 //	apiURL = [[NSURL URLWithString:[NSString stringWithFormat:@"https://%@:X@%@.freshbooks.com/api/2.1/xml-in", apiKey, domain]] retain];
-	apiURL = [[NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:3000/", apiKey, domain]] retain];
+	apiURL = [[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@api.tedslaptop.com:3000/", domain, apiKey]] retain];
 	NSLog(@"setting url: %@ \n user: %@", apiURL, [apiURL user]);
 }
 

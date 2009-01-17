@@ -53,8 +53,7 @@ static FreshbooksAPI *sharedInstance = nil;
 	if(apiURL){
 		[apiURL release];
 	}
-//	apiURL = [[NSURL URLWithString:[NSString stringWithFormat:@"https://%@:X@%@.freshbooks.com/api/2.1/xml-in", apiKey, domain]] retain];
-	apiURL = [[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@api.tedslaptop.com:3000/", domain, apiKey]] retain];
+	apiURL = [[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@lesstimespent.com/", domain, apiKey]] retain];
 	NSLog(@"setting url: %@ \n user: %@", apiURL, [apiURL user]);
 }
 
@@ -83,7 +82,7 @@ static FreshbooksAPI *sharedInstance = nil;
 		NSMutableDictionary *project;
 		NSError *err;
 
-		NSData *responseData = [self performCall:@"<?xml version=\"1.0\" encoding=\"utf-8\" ?><request method=\"project.list\"></request>"];
+		NSData *responseData = [self performCall:@"projects.xml"];
 		
 		CXMLDocument *xmlDoc = [[CXMLDocument alloc] initWithData:responseData options:0 error:&err];
 		if([@"ok" caseInsensitiveCompare:[[[xmlDoc rootElement] attributeForName:@"status"] stringValue]] == NSOrderedSame){
@@ -92,9 +91,9 @@ static FreshbooksAPI *sharedInstance = nil;
 			
 			for (int i = 0; i < [projects count]; ++i) {
 				project = [NSMutableDictionary dictionary];
-				[project setValue:[[[[projects objectAtIndex:i] elementsForName:@"project_id"] objectAtIndex:0] stringValue] forKey:@"id"];
+				[project setValue:[[[[projects objectAtIndex:i] elementsForName:@"id"] objectAtIndex:0] stringValue] forKey:@"id"];
 				[project setValue:[[[[projects objectAtIndex:i] elementsForName:@"name"] objectAtIndex:0] stringValue] forKey:@"name"];
-				[project setValue:[self getTasksForProject:[project valueForKey:@"id"]] forKey:@"tasks"];
+//				[project setValue:[self getTasksForProject:[project valueForKey:@"id"]] forKey:@"tasks"];
 				[projectData addObject:project];
 			}
 			
@@ -146,7 +145,14 @@ static FreshbooksAPI *sharedInstance = nil;
 // Perform syncronous call
 - (NSData *) performCall:(NSString *)requestBody {
 
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:apiURL];
+   	NSMutableString *resourceURI = [[NSMutableString alloc] init];
+	[resourceURI appendString:[NSString stringWithFormat:@"http://%@:%@@lesstimespent.com/", domain, apiKey]];
+	[resourceURI appendString:requestBody];
+	NSLog(@"URI %@", resourceURI);
+   	NSURL *resourceURL = [[NSURL URLWithString:resourceURI] retain];
+	NSLog(@"URL %@", resourceURL);
+	
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:resourceURL];
 	[request setHTTPMethod:@"POST"];
 	[request setValue:@"Freshbooks iPhone Client 1.0" forHTTPHeaderField:@"X-User-Agent"];
 	[request setHTTPBody:[requestBody dataUsingEncoding: NSUTF8StringEncoding]];
@@ -164,8 +170,10 @@ static FreshbooksAPI *sharedInstance = nil;
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:apiURL];
 	[request setHTTPMethod:@"POST"];
 	[request setValue:@"Freshbooks iPhone Client 1.0" forHTTPHeaderField:@"X-User-Agent"];
-	[request setHTTPBody:[requestBody dataUsingEncoding: NSUTF8StringEncoding]];
+//	[request setHTTPBody:[requestBody dataUsingEncoding: NSUTF8StringEncoding]];
 	
+	[resourceURL release];
+	[resourceURI release];
 	NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate: delegate];
 	return connection;
 }

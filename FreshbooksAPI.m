@@ -154,7 +154,7 @@ static FreshbooksAPI *sharedInstance = nil;
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:suffixedApiURL];
 	[request setHTTPMethod:@"GET"];
 	[request setValue:@"Freshbooks iPhone Client 1.0" forHTTPHeaderField:@"X-User-Agent"];
-	[request setHTTPBody:[requestBody dataUsingEncoding: NSUTF8StringEncoding]];
+	//[request setHTTPBody:[requestBody dataUsingEncoding: NSUTF8StringEncoding]];
 
 	NSURLResponse *response;
 	NSError *err;
